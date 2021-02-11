@@ -1,0 +1,60 @@
+#include <GY91.h>
+#include <SoftwareSerial.h>
+
+GY91 gy91;
+
+float pressure,temp,altBar;
+double ax, ay, az, gx, gy, gz, mx, my, mz;
+int ecg;
+
+//SoftwareSerial(RXPin,TXPin)
+
+SoftwareSerial radio(4, 5);
+
+void setup() { 
+  radio.begin(9600);
+  Serial.begin(9600);
+  if (!gy91.init()) {
+    mensaje("Could not initiate");
+    }
+}
+
+void loop() {
+  
+  lecturaIMU();
+  displayDatos();
+  delay(50);
+}
+
+
+void lecturaIMU(){
+  gy91.read_acc();
+  gy91.read_gyro();
+  gy91.read_mag();
+  pressure = gy91.readPressure();
+  temp = gy91.readTemperature();
+  altBar = gy91.readAltitude(1022.00);
+  ax = gy91.ax;
+  ay = gy91.ay;
+  az = gy91.az;
+  gx = gy91.gx;
+  gy = gy91.gy;
+  gz = gy91.gz;
+  mx = gy91.mx;
+  my = gy91.my;
+  mz = gy91.mz;
+  ecg=analogRead(A1);
+}
+
+
+void displayDatos(){
+  String cadena ="";//
+  cadena += "TOL," + String(pressure/100) + "," + String(temp) + "," + String(ax)+ ","+ String(ay)+ ","+ String(az) + ","
+  + String(gx)+ ","+ String(gy)+ ","+ String(gz)+ ","+ String(ecg); 
+  mensaje(cadena);  
+}
+void mensaje(String m){
+  Serial.println(m);
+  radio.println(m);
+ 
+}
